@@ -1,0 +1,14 @@
+# Core dependencies (runnable without GPU)
+pydantic>=2.0.0
+sqlglot>=20.0.0
+httpx>=0.25.0
+pytest>=8.0.0
+
+# Optional GPU training dependencies (install on CUDA environment):
+# torch>=2.2.0
+# transformers>=4.40.0
+# peft>=0.10.0
+# trl>=0.8.0
+# bitsandbytes>=0.43.0
+# accelerate>=0.28.0
+# unsloth

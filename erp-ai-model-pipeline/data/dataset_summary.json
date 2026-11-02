@@ -1,0 +1,15 @@
+{
+  "total_samples": 3000,
+  "train_samples": 2700,
+  "val_samples": 300,
+  "bird_count": 2100,
+  "gretel_count": 600,
+  "refusal_count": 300,
+  "train_path": "erp-ai-model-pipeline/data/train.jsonl",
+  "val_path": "erp-ai-model-pipeline/data/val.jsonl",
+  "validation_report": {
+    "is_valid": true,
+    "total_records": 3000,
+    "valid_records": 3000
+  }
+}

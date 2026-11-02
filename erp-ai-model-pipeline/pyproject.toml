@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "erp-ai-model-pipeline"
+version = "0.1.0"
+description = "Phase 2 Fine-Tuning Pipeline & Evaluation Suite for ERP Text-to-SQL"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0.0",
+    "sqlglot>=20.0.0",
+    "httpx>=0.25.0",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "torch>=2.2.0",
+    "transformers>=4.40.0",
+    "peft>=0.10.0",
+    "trl>=0.8.0",
+    "bitsandbytes>=0.43.0",
+    "accelerate>=0.28.0",
+    "unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git",
+]
+test = [
+    "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

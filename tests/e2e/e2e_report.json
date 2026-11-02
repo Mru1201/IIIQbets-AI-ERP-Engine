@@ -1,0 +1,61 @@
+{
+  "suite": "Autonomous AI ERP Reporting System - E2E Verification Suite",
+  "timestamp": "2026-11-02T15:32:36.374596+00:00",
+  "status": "PASSED",
+  "total_tests": 336,
+  "passed": 336,
+  "failed": 0,
+  "errors": 0,
+  "pass_rate_pct": 100.0,
+  "total_duration_s": 5.07,
+  "tiers": [
+    {
+      "tier_id": "1",
+      "tier": "Tier 1: Feature Verification (Features 1-32)",
+      "file": "tests/e2e/tier1_feature_tests.py",
+      "status": "PASSED",
+      "return_code": 0,
+      "passed": 169,
+      "failed": 0,
+      "errors": 0,
+      "total": 169,
+      "duration_s": 2.47
+    },
+    {
+      "tier_id": "2",
+      "tier": "Tier 2: Boundary & Corner Cases",
+      "file": "tests/e2e/tier2_boundary_tests.py",
+      "status": "PASSED",
+      "return_code": 0,
+      "passed": 61,
+      "failed": 0,
+      "errors": 0,
+      "total": 61,
+      "duration_s": 0.72
+    },
+    {
+      "tier_id": "3",
+      "tier": "Tier 3: Pairwise Combinatorial Interactions",
+      "file": "tests/e2e/tier3_pairwise_tests.py",
+      "status": "PASSED",
+      "return_code": 0,
+      "passed": 66,
+      "failed": 0,
+      "errors": 0,
+      "total": 66,
+      "duration_s": 1.11
+    },
+    {
+      "tier_id": "4",
+      "tier": "Tier 4: Real-World Agro ERP Scenarios",
+      "file": "tests/e2e/tier4_realworld_tests.py",
+      "status": "PASSED",
+      "return_code": 0,
+      "passed": 40,
+      "failed": 0,
+      "errors": 0,
+      "total": 40,
+      "duration_s": 0.77
+    }
+  ]
+}

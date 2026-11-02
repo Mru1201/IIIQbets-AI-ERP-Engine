@@ -1,0 +1,29 @@
+# 1. Ignore client application repos (tracked independently)
+ledger-backend/
+shreeshashwatraj-frontend/
+
+# 2. Ignore local database dumps & raw sensitive files
+*.sql
+*.sqlite
+*.db
+
+# 3. Ignore Python & Node environments / caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+env/
+node_modules/
+
+# 4. Ignore heavy model binaries & checkpoints (keep Git lightweight)
+erp-ai-model-pipeline/outputs/
+erp-ai-model-pipeline/exported_models/
+outputs/
+*.gguf
+*.bin
+*.safetensors
+*.pt
+
+# 5. Agent metadata & OS files
+.agents/
+.DS_Store

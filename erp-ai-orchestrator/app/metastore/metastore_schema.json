@@ -1,0 +1,3124 @@
+{
+  "metastore_version": "1.0",
+  "tenant_id": "shree_shashwatraj_agro",
+  "tenant_name": "Shree Shashwatraj Agro Pvt Ltd",
+  "sql_dialect": "mysql",
+  "database": "ledger",
+  "generated_from": {
+    "source": "sql_dump",
+    "ref": "ledger (34).sql",
+    "sha256": "2ad1aeb6c6764bb60a6cb5d96a4a01602272b6074fab8bf33e20c98fd4aecc15"
+  },
+  "security": {
+    "read_only": true,
+    "max_row_limit": 1000,
+    "restricted_tables": [
+      "gsp_api",
+      "gsp_credentials"
+    ],
+    "excluded_tables": {
+      "chatbot_audit_log": "internal AI audit trail (not business data)",
+      "gsp_api": "credential store (restricted)",
+      "gsp_credentials": "credential store (restricted)"
+    },
+    "excluded_columns": {
+      "accounts": [
+        "aadhaar_number",
+        "bank_account_number",
+        "otp",
+        "otp_expires_at",
+        "otp_used",
+        "password",
+        "upi_id"
+      ],
+      "voucher": [
+        "pdf_data"
+      ]
+    }
+  },
+  "modules": {
+    "accounting": "Chart of accounts, parties (retailers/suppliers/staff), ledgers, vouchers, bank deposits.",
+    "inventory": "Products, batches (live stock), categories, companies/brands, units, offers.",
+    "sales_purchase": "Sales/Purchase/Receipt/Credit-Debit note vouchers and their line items, GST.",
+    "orders": "Retailer app orders, order lines, carts, credit periods, field sales visits.",
+    "finance_expenses": "Staff expenses, bank statement deposits, P&L inputs."
+  },
+  "tables": {
+    "accountgroup": {
+      "description": "Chart-of-accounts groups (Sundry Debtors, Bank Accounts, ...).",
+      "module_scope": [
+        "accounting"
+      ],
+      "primary_key": [
+        "accountgroup_id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 34,
+      "columns": {
+        "accountgroup_id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "AccountsGroupName": {
+          "type": "varchar(255)",
+          "nullable": false
+        }
+      }
+    },
+    "accounts": {
+      "description": "Party master: retailers (customers), suppliers, staff, admin and ledger accounts. role identifies the party type.",
+      "module_scope": [
+        "accounting",
+        "sales_purchase",
+        "orders",
+        "finance_expenses"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 55,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "account_group_id": {
+          "type": "int(20)",
+          "nullable": true
+        },
+        "group": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Ledger group label (reserved word: always back-quote as `group`).",
+          "known_values": [
+            "Bank Accounts",
+            "Capital Account",
+            "Current Assets",
+            "Expenses (Indirect/Admn.)",
+            "Investments",
+            "Pre-Operative Expenses",
+            "Retailer",
+            "SUPPLIERS",
+            "Sundry Debtors",
+            "customer",
+            "staff",
+            "supplier"
+          ]
+        },
+        "title": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "entity_type": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "known_values": [
+            "Company",
+            "Individual",
+            "Partnership",
+            "group"
+          ]
+        },
+        "name": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "description": "Party / person name."
+        },
+        "role": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "description": "Party type. Compare case-insensitively (collation is *_ci).",
+          "known_values": [
+            "admin",
+            "retailer",
+            "staff",
+            "supplier"
+          ]
+        },
+        "status": {
+          "type": "varchar(200)",
+          "nullable": true,
+          "description": "Account status; observed values '1' and 'Active' both mean active.",
+          "known_values": [
+            "1",
+            "Active"
+          ]
+        },
+        "opening_balance": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Opening ledger balance; direction in opening_balance_type (Debit/Credit).",
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(accounts.opening_balance AS DECIMAL(15,2))"
+        },
+        "mobile_number": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "email": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "gstin": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "gst_registered_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "business_name": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "description": "Trade name of the party."
+        },
+        "additional_business_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "display_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "phone_number": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "fax": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "account_number": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "account_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "bank_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "account_type": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "known_values": [
+            "Current Account",
+            "Savings",
+            "Savings Account"
+          ]
+        },
+        "branch_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "ifsc_code": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "pan": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "tan": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "tds_slab_rate": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "currency": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "terms_of_payment": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "reverse_charge": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "export_sez": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "shipping_address_line1": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "shipping_address_line2": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "shipping_city": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "shipping_pin_code": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "shipping_state": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "shipping_state_code": {
+          "type": "varchar(5)",
+          "nullable": true
+        },
+        "shipping_country": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "shipping_branch_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "shipping_gstin": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "billing_address_line1": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "billing_address_line2": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "billing_city": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "billing_pin_code": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "billing_state": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "billing_state_code": {
+          "type": "varchar(5)",
+          "nullable": true
+        },
+        "billing_country": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "billing_branch_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "billing_gstin": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "staffid": {
+          "type": "int(100)",
+          "nullable": true
+        },
+        "assigned_staff": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "staff_incentive": {
+          "type": "varchar(200)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(accounts.staff_incentive AS DECIMAL(15,2))"
+        },
+        "discount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "Target": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "alternate_number": {
+          "type": "varchar(15)",
+          "nullable": true
+        },
+        "date_of_birth": {
+          "type": "date",
+          "nullable": true
+        },
+        "gender": {
+          "type": "varchar(10)",
+          "nullable": true,
+          "known_values": [
+            "Other"
+          ]
+        },
+        "address": {
+          "type": "text",
+          "nullable": true
+        },
+        "designation": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "known_values": [
+            "Manager"
+          ]
+        },
+        "department": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "known_values": [
+            "Manager"
+          ]
+        },
+        "joining_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "incentive_percent": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "salary": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "blood_group": {
+          "type": "varchar(5)",
+          "nullable": true
+        },
+        "emergency_contact": {
+          "type": "varchar(15)",
+          "nullable": true
+        },
+        "credit_limit": {
+          "type": "int(255)",
+          "nullable": true,
+          "description": "Credit limit in INR."
+        },
+        "unpaid_amount": {
+          "type": "varchar(250)",
+          "nullable": true,
+          "description": "Running outstanding receivable for the party (maintained by voucher routes).",
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(accounts.unpaid_amount AS DECIMAL(15,2))"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "score": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "score_tier": {
+          "type": "varchar(20)",
+          "nullable": true,
+          "known_values": [
+            "Basic"
+          ]
+        },
+        "last_score_calculated": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "score_details": {
+          "type": "longtext",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "balance_amount": {
+          "type": "decimal(15,2)",
+          "nullable": true,
+          "description": "credit_limit - unpaid_amount (available credit)."
+        },
+        "current_score": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "target_achieved": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "achievement_percentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "last_target_calculated": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "target_period": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "known_values": [
+            "monthly"
+          ]
+        },
+        "score_marks": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "opening_balance_type": {
+          "type": "varchar(10)",
+          "nullable": true,
+          "known_values": [
+            "Credit",
+            "Debit"
+          ]
+        },
+        "is_dual_account": {
+          "type": "tinyint(1)",
+          "nullable": true,
+          "description": "1 when a supplier is also a retailer."
+        },
+        "balance": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "balance_type": {
+          "type": "enum('Dr','Cr')",
+          "nullable": true,
+          "enum_values": [
+            "Dr",
+            "Cr"
+          ]
+        }
+      }
+    },
+    "batches": {
+      "description": "Product batches holding LIVE stock. quantity is the running on-hand stock, mutated by every stock-in (Purchase/CreditNote/stock inward) and stock-out (Sales/DebitNote/stock transfer).",
+      "module_scope": [
+        "inventory"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [
+        {
+          "columns": [
+            "product_id"
+          ],
+          "ref_table": "products",
+          "ref_columns": [
+            "id"
+          ],
+          "name": "batches_ibfk_1"
+        }
+      ],
+      "row_count_snapshot": 15,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "product_id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "batch_number": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "group_by": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "mfg_date": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Manufacturing date stored as VARCHAR."
+        },
+        "exp_date": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Expiry date stored as VARCHAR (YYYY-MM-DD); use STR_TO_DATE(exp_date, '%Y-%m-%d')."
+        },
+        "product_type": {
+          "type": "varchar(20)",
+          "nullable": true,
+          "known_values": [
+            "KACHA",
+            "PAKKA"
+          ]
+        },
+        "quantity": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Current on-hand stock for the batch.",
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.quantity AS DECIMAL(15,2))"
+        },
+        "opening_stock": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.opening_stock AS DECIMAL(15,2))"
+        },
+        "stock_in": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Cumulative inward quantity.",
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.stock_in AS DECIMAL(15,2))"
+        },
+        "stock_out": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Cumulative outward quantity.",
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.stock_out AS DECIMAL(15,2))"
+        },
+        "cost_price": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.cost_price AS DECIMAL(15,2))"
+        },
+        "selling_price": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.selling_price AS DECIMAL(15,2))"
+        },
+        "purchase_price": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.purchase_price AS DECIMAL(15,2))"
+        },
+        "mrp": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.mrp AS DECIMAL(15,2))"
+        },
+        "min_sale_price": {
+          "type": "varchar(200)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.min_sale_price AS DECIMAL(15,2))"
+        },
+        "batch_price": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(batches.batch_price AS DECIMAL(15,2))"
+        },
+        "barcode": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "remark": {
+          "type": "varchar(300)",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "opening_stock_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "weight": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "batches": {
+          "type": "varchar(255)",
+          "nullable": true
+        }
+      }
+    },
+    "cart_items": {
+      "description": "Retailer app shopping cart lines.",
+      "module_scope": [
+        "orders"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 3,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "customer_id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "staff_id": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "product_id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "price": {
+          "type": "varchar(200)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(cart_items.price AS DECIMAL(15,2))"
+        },
+        "quantity": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "credit_period": {
+          "type": "int(11)",
+          "nullable": true,
+          "known_values": [
+            "0",
+            "3"
+          ]
+        },
+        "credit_percentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        }
+      }
+    },
+    "categories": {
+      "description": "Product categories with active discount.",
+      "module_scope": [
+        "inventory"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 30,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "category_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "discount": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "discount_end_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        }
+      }
+    },
+    "categories_discount_history": {
+      "description": "Historical category discount windows.",
+      "module_scope": [
+        "inventory"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [
+        {
+          "columns": [
+            "category_id"
+          ],
+          "ref_table": "categories",
+          "ref_columns": [
+            "id"
+          ],
+          "name": "categories_discount_history_ibfk_1"
+        }
+      ],
+      "row_count_snapshot": 14,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "category_id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "discount_value": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "start_date": {
+          "type": "date",
+          "nullable": false
+        },
+        "end_date": {
+          "type": "date",
+          "nullable": false
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        }
+      }
+    },
+    "companies": {
+      "description": "Manufacturer / brand companies (products.company_id).",
+      "module_scope": [
+        "inventory"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 35,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "company_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "discount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        }
+      }
+    },
+    "company_info": {
+      "description": "Tenant's own legal entity details (single row).",
+      "module_scope": [
+        "accounting"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 1,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "company_name": {
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        "branch": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "email": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "phone": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "gstin": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "state": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "state_code": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "location": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "address": {
+          "type": "text",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "bank_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "account_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "account_number": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "ifsc_code": {
+          "type": "varchar(20)",
+          "nullable": true
+        }
+      }
+    },
+    "credit_periods": {
+      "description": "Credit period (days) -> credit surcharge percentage.",
+      "module_scope": [
+        "orders",
+        "sales_purchase"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 5,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "credit_period": {
+          "type": "varchar(50)",
+          "nullable": false,
+          "known_values": [
+            "0",
+            "15",
+            "3",
+            "30",
+            "8"
+          ]
+        },
+        "credit_percentage": {
+          "type": "varchar(10)",
+          "nullable": false,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(credit_periods.credit_percentage AS DECIMAL(15,2))"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        }
+      }
+    },
+    "direct_deposit": {
+      "description": "Imported bank statement lines, reconciled to Receipt vouchers.",
+      "module_scope": [
+        "finance_expenses",
+        "accounting"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {
+        "transaction_id": [
+          "transaction_id"
+        ]
+      },
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 20,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "transaction_id": {
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        "txn_date": {
+          "type": "date",
+          "nullable": false
+        },
+        "value_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "description": {
+          "type": "text",
+          "nullable": false
+        },
+        "ref_no": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "branch_code": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "debit": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "credit": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "balance": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "status": {
+          "type": "varchar(20)",
+          "nullable": true,
+          "known_values": [
+            "approved",
+            "pending"
+          ]
+        },
+        "voucher_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "party_id": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "description": "accounts.id stored as VARCHAR."
+        },
+        "party_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        }
+      }
+    },
+    "expensive": {
+      "description": "Staff operating expenses (table name is a legacy typo of 'expenses'). No primary key.",
+      "module_scope": [
+        "finance_expenses"
+      ],
+      "primary_key": [],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 5,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "staff_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "staff_name": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "category_id": {
+          "type": "int(50)",
+          "nullable": true
+        },
+        "category": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "known_values": [
+            "Desel",
+            "Petrol"
+          ]
+        },
+        "amount": {
+          "type": "decimal(10,2)",
+          "nullable": true,
+          "description": "Expense amount in INR."
+        },
+        "date": {
+          "type": "date",
+          "nullable": true,
+          "description": "Expense date (reserved word: back-quote as `date`)."
+        },
+        "note": {
+          "type": "text",
+          "nullable": true
+        },
+        "status": {
+          "type": "varchar(150)",
+          "nullable": true,
+          "description": "Approval status (case varies).",
+          "known_values": [
+            "Pending",
+            "approved",
+            "pending"
+          ]
+        },
+        "payment_status": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "description": "Reimbursement state.",
+          "known_values": [
+            "paid",
+            "unpaid"
+          ]
+        }
+      }
+    },
+    "offers": {
+      "description": "Promotional offers / flash sales.",
+      "module_scope": [
+        "orders",
+        "inventory"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 10,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "title": {
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        "description": {
+          "type": "text",
+          "nullable": true
+        },
+        "discount_percentage": {
+          "type": "decimal(5,2)",
+          "nullable": false
+        },
+        "minimum_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "valid_from": {
+          "type": "date",
+          "nullable": false
+        },
+        "valid_until": {
+          "type": "date",
+          "nullable": false
+        },
+        "image_url": {
+          "type": "varchar(500)",
+          "nullable": true
+        },
+        "offer_type": {
+          "type": "enum('bogo','expiry','clearance','seasonal','hourly','limited_stock','global','category')",
+          "nullable": true,
+          "enum_values": [
+            "bogo",
+            "expiry",
+            "clearance",
+            "seasonal",
+            "hourly",
+            "limited_stock",
+            "global",
+            "category"
+          ]
+        },
+        "status": {
+          "type": "enum('active','inactive')",
+          "nullable": true,
+          "enum_values": [
+            "active",
+            "inactive"
+          ]
+        },
+        "category_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "category_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "product_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "product_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "offer_scope": {
+          "type": "enum('global','category')",
+          "nullable": false,
+          "enum_values": [
+            "global",
+            "category"
+          ]
+        },
+        "purchase_limit": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(offers.purchase_limit AS DECIMAL(15,2))"
+        },
+        "offer": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "company_id": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "company_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "buy_quantity": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "get_quantity": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "terms_conditions": {
+          "type": "text",
+          "nullable": true
+        },
+        "start_time": {
+          "type": "time",
+          "nullable": true
+        },
+        "end_time": {
+          "type": "time",
+          "nullable": true
+        }
+      }
+    },
+    "order_items": {
+      "description": "Order lines joined by order_number.",
+      "module_scope": [
+        "orders"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 0,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "order_number": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "item_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "product_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "mrp": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "sale_price": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "edited_sale_price": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "credit_charge": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "customer_sale_price": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "final_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "quantity": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "total_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "net_price": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "order_items": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "discount_percentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "discount_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "taxable_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "tax_percentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "tax_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "item_total": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "credit_period": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "invoice_number": {
+          "type": "varchar(50)",
+          "nullable": false
+        },
+        "invoice_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "invoice_status": {
+          "type": "tinyint(1)",
+          "nullable": false
+        },
+        "admin_approval": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "datetime(6)",
+          "nullable": true
+        },
+        "updated_at": {
+          "type": "datetime(6)",
+          "nullable": true
+        },
+        "credit_percentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "sgst_percentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "sgst_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "cgst_percentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "cgst_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "discount_applied_scheme": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "stock_status": {
+          "type": "enum('AVAILABLE','OUT_OF_STOCK','INSUFFICIENT_STOCK')",
+          "nullable": true,
+          "enum_values": [
+            "AVAILABLE",
+            "OUT_OF_STOCK",
+            "INSUFFICIENT_STOCK"
+          ]
+        },
+        "order_mode": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "weight": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "flash_offer": {
+          "type": "tinyint(1)",
+          "nullable": true
+        },
+        "buy_quantity": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "get_quantity": {
+          "type": "int(11)",
+          "nullable": true
+        }
+      }
+    },
+    "orders": {
+      "description": "Retailer app orders (header). Invoiced orders have invoice_status = 1.",
+      "module_scope": [
+        "orders"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {
+        "order_number": [
+          "order_number"
+        ]
+      },
+      "declared_foreign_keys": [
+        {
+          "columns": [
+            "customer_id"
+          ],
+          "ref_table": "accounts",
+          "ref_columns": [
+            "id"
+          ],
+          "name": "orders_ibfk_1"
+        },
+        {
+          "columns": [
+            "order_placed_by"
+          ],
+          "ref_table": "accounts",
+          "ref_columns": [
+            "id"
+          ],
+          "name": "orders_ibfk_2"
+        }
+      ],
+      "row_count_snapshot": 0,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "order_number": {
+          "type": "varchar(50)",
+          "nullable": false
+        },
+        "customer_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "retailer_mobile": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "customer_name": {
+          "type": "varchar(150)",
+          "nullable": true
+        },
+        "order_total": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "discount_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "taxable_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "tax_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "net_payable": {
+          "type": "decimal(10,2)",
+          "nullable": true,
+          "description": "Final payable amount for the order (used for retailer purchase totals)."
+        },
+        "credit_period": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "estimated_delivery_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "order_placed_by": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "ordered_by": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "staff_id": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "assigned_staff": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "order_mode": {
+          "type": "enum('KACHA','PAKKA')",
+          "nullable": true,
+          "description": "KACHA (no GST invoice) / PAKKA (GST invoice).",
+          "enum_values": [
+            "KACHA",
+            "PAKKA"
+          ]
+        },
+        "invoice_number": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "invoice_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "invoice_status": {
+          "type": "tinyint(1)",
+          "nullable": false,
+          "description": "1 = invoiced, 0 = not invoiced."
+        },
+        "order_status": {
+          "type": "enum('Pending','Invoice','Cancelled')",
+          "nullable": true,
+          "description": "Lifecycle. Exclude 'Cancelled' from revenue.",
+          "enum_values": [
+            "Pending",
+            "Invoice",
+            "Cancelled"
+          ]
+        },
+        "staff_incentive": {
+          "type": "varchar(200)",
+          "nullable": true
+        },
+        "approval_status": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "modification_required": {
+          "type": "tinyint(1)",
+          "nullable": true
+        },
+        "modification_reason": {
+          "type": "varchar(255)",
+          "nullable": true
+        }
+      }
+    },
+    "products": {
+      "description": "Product master. purchase_price (INT) is the costing basis for COGS.",
+      "module_scope": [
+        "inventory",
+        "sales_purchase",
+        "orders"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 15,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "group_by": {
+          "type": "text",
+          "nullable": true
+        },
+        "goods_name": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Product name; production COGS joins voucherdetails.product = products.goods_name."
+        },
+        "category_id": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "description": "categories.id stored as VARCHAR."
+        },
+        "company_id": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "description": "companies.id stored as VARCHAR."
+        },
+        "price": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "description": "Selling price.",
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(products.price AS DECIMAL(15,2))"
+        },
+        "products": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "purchase_price": {
+          "type": "int(200)",
+          "nullable": true,
+          "description": "Unit cost used for COGS."
+        },
+        "inclusive_gst": {
+          "type": "varchar(10)",
+          "nullable": true
+        },
+        "gst_rate": {
+          "type": "varchar(10)",
+          "nullable": true,
+          "description": "GST % as text.",
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(products.gst_rate AS DECIMAL(15,2))"
+        },
+        "product_type": {
+          "type": "varchar(20)",
+          "nullable": true,
+          "known_values": [
+            "KACHA",
+            "PAKKA"
+          ]
+        },
+        "non_taxable": {
+          "type": "varchar(10)",
+          "nullable": true
+        },
+        "net_price": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(products.net_price AS DECIMAL(15,2))"
+        },
+        "hsn_code": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "unit": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "description": "Mostly units.id as text; occasionally a literal like 'pcs'.",
+          "known_values": [
+            "11",
+            "2",
+            "6",
+            "7",
+            "9",
+            "pcs"
+          ]
+        },
+        "weight": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "cess_rate": {
+          "type": "varchar(10)",
+          "nullable": true
+        },
+        "cess_amount": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(products.cess_amount AS DECIMAL(15,2))"
+        },
+        "sku": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "min_stock_alert": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(products.min_stock_alert AS DECIMAL(15,2))"
+        },
+        "max_stock_alert": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(products.max_stock_alert AS DECIMAL(15,2))"
+        },
+        "description": {
+          "type": "varchar(500)",
+          "nullable": true
+        },
+        "maintain_batch": {
+          "type": "tinyint(1)",
+          "nullable": true
+        },
+        "can_be_sold": {
+          "type": "tinyint(1)",
+          "nullable": true
+        },
+        "images": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "min_sale_price": {
+          "type": "int(200)",
+          "nullable": true
+        },
+        "mrp": {
+          "type": "varchar(222)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(products.mrp AS DECIMAL(15,2))"
+        },
+        "purchase_product_id": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "opening_stock_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "document_type": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "known_values": [
+            "Bill of Supply",
+            "Tax Invoice"
+          ]
+        }
+      }
+    },
+    "sales_visits": {
+      "description": "Field sales staff visits to retailers.",
+      "module_scope": [
+        "orders",
+        "sales_purchase"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 3,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "retailer_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "retailer_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "staff_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "staff_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "visit_type": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "known_values": [
+            "Routine"
+          ]
+        },
+        "visit_outcome": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "known_values": [
+            "Pending",
+            "Successful"
+          ]
+        },
+        "sales_amount": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "transaction_type": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "known_values": [
+            "Kacha",
+            "Pakka"
+          ]
+        },
+        "description": {
+          "type": "text",
+          "nullable": true
+        },
+        "created_at": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "updated_at": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "location": {
+          "type": "varchar(550)",
+          "nullable": true
+        },
+        "image_filename": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "date": {
+          "type": "date",
+          "nullable": true
+        }
+      }
+    },
+    "saletypes": {
+      "description": "Sale series / godown definitions.",
+      "module_scope": [
+        "sales_purchase"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 3,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "sale_type": {
+          "type": "varchar(100)",
+          "nullable": false,
+          "known_values": [
+            "godown1",
+            "godown2",
+            "shree shashwath"
+          ]
+        },
+        "series": {
+          "type": "varchar(100)",
+          "nullable": false
+        },
+        "created_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        }
+      }
+    },
+    "units": {
+      "description": "Units of measure.",
+      "module_scope": [
+        "inventory"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 9,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "name": {
+          "type": "varchar(100)",
+          "nullable": false
+        }
+      }
+    },
+    "voucher": {
+      "description": "Universal voucher header: Sales, Purchase, Receipt, Payment, CreditNote, DebitNote, Journal, Contra, stock transfer, stock inward, purchase voucher, Production, Consumption.",
+      "module_scope": [
+        "sales_purchase",
+        "accounting"
+      ],
+      "primary_key": [
+        "VoucherID"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [],
+      "row_count_snapshot": 5,
+      "columns": {
+        "VoucherID": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "TransactionType": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "description": "Voucher type. Compare case-insensitively; 'Stock Transfer' = KACHA sale.",
+          "known_values": [
+            "Consumption",
+            "Contra",
+            "CreditNote",
+            "DebitNote",
+            "Journal",
+            "Payment",
+            "Production",
+            "Purchase",
+            "Receipt",
+            "Sales",
+            "purchase voucher",
+            "stock inward",
+            "stock transfer"
+          ]
+        },
+        "VchNo": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "product_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "batch_id": {
+          "type": "varchar(200)",
+          "nullable": true
+        },
+        "batch_number": {
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        "InvoiceNumber": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "saleType": {
+          "type": "varchar(200)",
+          "nullable": true,
+          "known_values": [
+            "shree shashwath"
+          ]
+        },
+        "order_number": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "Date": {
+          "type": "datetime",
+          "nullable": true,
+          "description": "Voucher date (DATETIME); filter with DATE(v.Date)."
+        },
+        "PaymentTerms": {
+          "type": "text",
+          "nullable": true
+        },
+        "Freight": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "TotalPacks": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "TaxAmount": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "Subtotal": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "BillSundryAmount": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "TotalAmount": {
+          "type": "decimal(15,2)",
+          "nullable": true,
+          "description": "Grand total incl. GST (revenue basis for Sales)."
+        },
+        "ChequeNo": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "ChequeDate": {
+          "type": "date",
+          "nullable": true
+        },
+        "BankName": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "AccountID": {
+          "type": "int(11)",
+          "nullable": true,
+          "description": "Ledger (cash/bank/sales) accounts.id."
+        },
+        "AccountName": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "PartyID": {
+          "type": "int(11)",
+          "nullable": true,
+          "description": "Counter-party accounts.id."
+        },
+        "PartyName": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "business_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "BasicAmount": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "ValueOfGoods": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "EntryDate": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "SGSTPercentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "CGSTPercentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "IGSTPercentage": {
+          "type": "decimal(5,2)",
+          "nullable": true
+        },
+        "SGSTAmount": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "CGSTAmount": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "IGSTAmount": {
+          "type": "decimal(15,2)",
+          "nullable": true
+        },
+        "TaxSystem": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "known_values": [
+            "GST"
+          ]
+        },
+        "paid_amount": {
+          "type": "decimal(15,2)",
+          "nullable": true,
+          "description": "Amount received/paid against this invoice."
+        },
+        "created_at": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "balance_amount": {
+          "type": "decimal(15,2)",
+          "nullable": true,
+          "description": "Outstanding amount on this invoice."
+        },
+        "status": {
+          "type": "enum('Pending','Partial','Paid')",
+          "nullable": true,
+          "description": "Payment status ENUM(Pending, Partial, Paid).",
+          "enum_values": [
+            "Pending",
+            "Partial",
+            "Paid"
+          ]
+        },
+        "paid_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "DC": {
+          "type": "varchar(10)",
+          "nullable": true,
+          "description": "Debit/Credit marker: 'D' or 'C'.",
+          "known_values": [
+            "D"
+          ]
+        },
+        "staffid": {
+          "type": "int(11)",
+          "nullable": true,
+          "description": "Assigned salesperson accounts.id."
+        },
+        "assigned_staff": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "pdf_file_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "transaction_proof": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "pdf_created_at": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "note": {
+          "type": "text",
+          "nullable": true
+        },
+        "description_preview": {
+          "type": "varchar(300)",
+          "nullable": true
+        },
+        "order_mode": {
+          "type": "enum('KACHA','PAKKA')",
+          "nullable": true,
+          "enum_values": [
+            "KACHA",
+            "PAKKA"
+          ]
+        },
+        "staff_incentive": {
+          "type": "varchar(200)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(voucher.staff_incentive AS DECIMAL(15,2))"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "nullable": false
+        },
+        "due_date": {
+          "type": "date",
+          "nullable": true
+        },
+        "total_discount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "total_credit_charge": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "data_type": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "retailer_mobile": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "payment_method": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "flash_offer": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "hsn_code": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "transport_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "gr_rr_number": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "vehicle_number": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "station_name": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "additional_charges_type": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "additional_charges_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "discount_charges": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "discount_charges_amount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "round_off": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "document_type": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "known_values": [
+            "Tax Invoice"
+          ]
+        },
+        "bb_bc": {
+          "type": "varchar(10)",
+          "nullable": true,
+          "known_values": [
+            "b2b"
+          ]
+        },
+        "L_I": {
+          "type": "varchar(20)",
+          "nullable": true,
+          "description": "local / interstate supply (drives CGST+SGST vs IGST).",
+          "known_values": [
+            "interstate",
+            "local"
+          ]
+        },
+        "gstin": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "amount_type": {
+          "type": "varchar(2)",
+          "nullable": true
+        },
+        "note_preview": {
+          "type": "text",
+          "nullable": true
+        },
+        "is_advance_receipt": {
+          "type": "tinyint(4)",
+          "nullable": true
+        },
+        "original_invoice_number": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "branch_code": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "ack_no": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "ack_date": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "irn_no": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "signed_qr_code": {
+          "type": "text",
+          "nullable": true
+        },
+        "signed_invoice": {
+          "type": "text",
+          "nullable": true
+        },
+        "qr_image": {
+          "type": "varchar(255)",
+          "nullable": true
+        },
+        "e_way_bill_no": {
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        "e_way_bill_date": {
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        "e_way_bill_valid_till": {
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        "e_way_bill_status": {
+          "type": "varchar(200)",
+          "nullable": true
+        },
+        "IRNgenerated_status": {
+          "type": "varchar(255)",
+          "nullable": false
+        },
+        "total_invoice_weight": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        }
+      }
+    },
+    "voucherdetails": {
+      "description": "Voucher line items (product, batch, qty, price, GST split).",
+      "module_scope": [
+        "sales_purchase",
+        "inventory",
+        "accounting"
+      ],
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": {},
+      "declared_foreign_keys": [
+        {
+          "columns": [
+            "voucher_id"
+          ],
+          "ref_table": "voucher",
+          "ref_columns": [
+            "VoucherID"
+          ],
+          "name": "voucherdetails_ibfk_1"
+        }
+      ],
+      "row_count_snapshot": 5,
+      "columns": {
+        "id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "voucher_id": {
+          "type": "int(11)",
+          "nullable": false
+        },
+        "product": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "Product name (matches products.goods_name)."
+        },
+        "product_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "InvoiceNumber": {
+          "type": "varchar(250)",
+          "nullable": true
+        },
+        "batch": {
+          "type": "varchar(255)",
+          "nullable": true,
+          "description": "batches.batch_number (with product_id)."
+        },
+        "batch_id": {
+          "type": "int(11)",
+          "nullable": true
+        },
+        "quantity": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "price": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "unit_id": {
+          "type": "varchar(100)",
+          "nullable": true
+        },
+        "discount": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "gst": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "cgst": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "sgst": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "igst": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "cess": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "total": {
+          "type": "decimal(10,2)",
+          "nullable": true,
+          "description": "Line total incl. tax."
+        },
+        "hsn_code": {
+          "type": "varchar(50)",
+          "nullable": true
+        },
+        "transaction_type": {
+          "type": "varchar(200)",
+          "nullable": true,
+          "description": "Mirrors voucher.TransactionType for the line.",
+          "known_values": [
+            "Purchase",
+            "Sales"
+          ]
+        },
+        "created_at": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "update_at": {
+          "type": "datetime",
+          "nullable": true
+        },
+        "get_quantity": {
+          "type": "varchar(50)",
+          "nullable": true,
+          "caveat": "NUMERIC_STORED_AS_TEXT",
+          "cast_hint": "CAST(voucherdetails.get_quantity AS DECIMAL(15,2))"
+        },
+        "original_price": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "inclusive_gst": {
+          "type": "varchar(20)",
+          "nullable": true
+        },
+        "document_type": {
+          "type": "varchar(100)",
+          "nullable": true,
+          "known_values": [
+            "Tax Invoice"
+          ]
+        },
+        "weight": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        },
+        "total_weight": {
+          "type": "decimal(10,2)",
+          "nullable": true
+        }
+      }
+    }
+  },
+  "allowed_joins": [
+    {
+      "id": "batches.product_id->products.id",
+      "left_table": "batches",
+      "left_column": "product_id",
+      "right_table": "products",
+      "right_column": "id",
+      "relationship": "declared_fk",
+      "cardinality": "many_to_one",
+      "description": "Declared FK batches_ibfk_1",
+      "on": "batches.product_id = products.id"
+    },
+    {
+      "id": "categories_discount_history.category_id->categories.id",
+      "left_table": "categories_discount_history",
+      "left_column": "category_id",
+      "right_table": "categories",
+      "right_column": "id",
+      "relationship": "declared_fk",
+      "cardinality": "many_to_one",
+      "description": "Declared FK categories_discount_history_ibfk_1",
+      "on": "categories_discount_history.category_id = categories.id"
+    },
+    {
+      "id": "orders.customer_id->accounts.id",
+      "left_table": "orders",
+      "left_column": "customer_id",
+      "right_table": "accounts",
+      "right_column": "id",
+      "relationship": "declared_fk",
+      "cardinality": "many_to_one",
+      "description": "Declared FK orders_ibfk_1",
+      "on": "orders.customer_id = accounts.id"
+    },
+    {
+      "id": "orders.order_placed_by->accounts.id",
+      "left_table": "orders",
+      "left_column": "order_placed_by",
+      "right_table": "accounts",
+      "right_column": "id",
+      "relationship": "declared_fk",
+      "cardinality": "many_to_one",
+      "description": "Declared FK orders_ibfk_2",
+      "on": "orders.order_placed_by = accounts.id"
+    },
+    {
+      "id": "voucherdetails.voucher_id->voucher.VoucherID",
+      "left_table": "voucherdetails",
+      "left_column": "voucher_id",
+      "right_table": "voucher",
+      "right_column": "VoucherID",
+      "relationship": "declared_fk",
+      "cardinality": "many_to_one",
+      "description": "Declared FK voucherdetails_ibfk_1",
+      "on": "voucherdetails.voucher_id = voucher.VoucherID"
+    },
+    {
+      "left_table": "order_items",
+      "left_column": "order_number",
+      "right_table": "orders",
+      "right_column": "order_number",
+      "cardinality": "many_to_one",
+      "description": "Order lines -> order header (retailerScore.js).",
+      "id": "order_items.order_number->orders.order_number",
+      "relationship": "logical",
+      "on": "order_items.order_number = orders.order_number"
+    },
+    {
+      "left_table": "voucher",
+      "left_column": "PartyID",
+      "right_table": "accounts",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Voucher counter-party (retailer/supplier).",
+      "id": "voucher.PartyID->accounts.id",
+      "relationship": "logical",
+      "on": "voucher.PartyID = accounts.id"
+    },
+    {
+      "left_table": "voucher",
+      "left_column": "AccountID",
+      "right_table": "accounts",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Voucher ledger account (cash/bank/sales).",
+      "alias_hint": "Use a distinct alias (e.g. acc) when joining accounts twice.",
+      "id": "voucher.AccountID->accounts.id",
+      "relationship": "logical",
+      "on": "voucher.AccountID = accounts.id"
+    },
+    {
+      "left_table": "voucher",
+      "left_column": "staffid",
+      "right_table": "accounts",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Assigned salesperson (salesReportRoutes.js).",
+      "id": "voucher.staffid->accounts.id",
+      "relationship": "logical",
+      "on": "voucher.staffid = accounts.id"
+    },
+    {
+      "left_table": "voucherdetails",
+      "left_column": "product_id",
+      "right_table": "products",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Voucher line -> product (id-based).",
+      "id": "voucherdetails.product_id->products.id",
+      "relationship": "logical",
+      "on": "voucherdetails.product_id = products.id"
+    },
+    {
+      "left_table": "voucherdetails",
+      "left_column": "product",
+      "right_table": "products",
+      "right_column": "goods_name",
+      "cardinality": "many_to_one",
+      "description": "Name-based product join used by production COGS (profitLossRoutes.js L62).",
+      "join_type_hint": "LEFT JOIN",
+      "id": "voucherdetails.product->products.goods_name",
+      "relationship": "logical",
+      "on": "voucherdetails.product = products.goods_name"
+    },
+    {
+      "left_table": "voucherdetails",
+      "left_column": "batch_id",
+      "right_table": "batches",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Voucher line -> batch. Alternative: (product_id, batch) = (batches.product_id, batches.batch_number).",
+      "id": "voucherdetails.batch_id->batches.id",
+      "relationship": "logical",
+      "on": "voucherdetails.batch_id = batches.id"
+    },
+    {
+      "left_table": "direct_deposit",
+      "left_column": "voucher_id",
+      "right_table": "voucher",
+      "right_column": "VoucherID",
+      "cardinality": "many_to_one",
+      "description": "Bank deposit reconciled to a Receipt voucher.",
+      "id": "direct_deposit.voucher_id->voucher.VoucherID",
+      "relationship": "logical",
+      "on": "direct_deposit.voucher_id = voucher.VoucherID"
+    },
+    {
+      "left_table": "direct_deposit",
+      "left_column": "party_id",
+      "right_table": "accounts",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Bank deposit -> party (party_id is VARCHAR).",
+      "id": "direct_deposit.party_id->accounts.id",
+      "relationship": "logical",
+      "caveat": "Type mismatch (direct_deposit.party_id=text, accounts.id=integer); MySQL coerces implicitly, prefer explicit CAST on the text side.",
+      "on": "direct_deposit.party_id = accounts.id"
+    },
+    {
+      "left_table": "voucher",
+      "left_column": "order_number",
+      "right_table": "orders",
+      "right_column": "order_number",
+      "cardinality": "many_to_one",
+      "description": "Invoice voucher generated from an app order.",
+      "id": "voucher.order_number->orders.order_number",
+      "relationship": "logical",
+      "on": "voucher.order_number = orders.order_number"
+    },
+    {
+      "left_table": "order_items",
+      "left_column": "product_id",
+      "right_table": "products",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Order line -> product (retailerScore.js L1422).",
+      "id": "order_items.product_id->products.id",
+      "relationship": "logical",
+      "on": "order_items.product_id = products.id"
+    },
+    {
+      "left_table": "accounts",
+      "left_column": "account_group_id",
+      "right_table": "accountgroup",
+      "right_column": "accountgroup_id",
+      "cardinality": "many_to_one",
+      "description": "Account -> chart-of-accounts group.",
+      "id": "accounts.account_group_id->accountgroup.accountgroup_id",
+      "relationship": "logical",
+      "on": "accounts.account_group_id = accountgroup.accountgroup_id"
+    },
+    {
+      "left_table": "products",
+      "left_column": "category_id",
+      "right_table": "categories",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Product -> category (category_id is VARCHAR).",
+      "id": "products.category_id->categories.id",
+      "relationship": "logical",
+      "caveat": "Type mismatch (products.category_id=text, categories.id=integer); MySQL coerces implicitly, prefer explicit CAST on the text side.",
+      "on": "products.category_id = categories.id"
+    },
+    {
+      "left_table": "products",
+      "left_column": "company_id",
+      "right_table": "companies",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Product -> brand company (company_id is VARCHAR).",
+      "id": "products.company_id->companies.id",
+      "relationship": "logical",
+      "caveat": "Type mismatch (products.company_id=text, companies.id=integer); MySQL coerces implicitly, prefer explicit CAST on the text side.",
+      "on": "products.company_id = companies.id"
+    },
+    {
+      "left_table": "expensive",
+      "left_column": "staff_id",
+      "right_table": "accounts",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Expense -> staff member.",
+      "id": "expensive.staff_id->accounts.id",
+      "relationship": "logical",
+      "on": "expensive.staff_id = accounts.id"
+    },
+    {
+      "left_table": "sales_visits",
+      "left_column": "retailer_id",
+      "right_table": "accounts",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Visit -> retailer.",
+      "id": "sales_visits.retailer_id->accounts.id",
+      "relationship": "logical",
+      "on": "sales_visits.retailer_id = accounts.id"
+    },
+    {
+      "left_table": "sales_visits",
+      "left_column": "staff_id",
+      "right_table": "accounts",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Visit -> staff member.",
+      "id": "sales_visits.staff_id->accounts.id",
+      "relationship": "logical",
+      "on": "sales_visits.staff_id = accounts.id"
+    },
+    {
+      "left_table": "cart_items",
+      "left_column": "customer_id",
+      "right_table": "accounts",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Cart line -> retailer.",
+      "id": "cart_items.customer_id->accounts.id",
+      "relationship": "logical",
+      "on": "cart_items.customer_id = accounts.id"
+    },
+    {
+      "left_table": "cart_items",
+      "left_column": "product_id",
+      "right_table": "products",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Cart line -> product.",
+      "id": "cart_items.product_id->products.id",
+      "relationship": "logical",
+      "on": "cart_items.product_id = products.id"
+    },
+    {
+      "left_table": "offers",
+      "left_column": "product_id",
+      "right_table": "products",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Product-scoped offer.",
+      "id": "offers.product_id->products.id",
+      "relationship": "logical",
+      "on": "offers.product_id = products.id"
+    },
+    {
+      "left_table": "offers",
+      "left_column": "category_id",
+      "right_table": "categories",
+      "right_column": "id",
+      "cardinality": "many_to_one",
+      "description": "Category-scoped offer.",
+      "id": "offers.category_id->categories.id",
+      "relationship": "logical",
+      "on": "offers.category_id = categories.id"
+    }
+  ],
+  "data_caveats": [
+    {
+      "table": "accounts",
+      "column": "opening_balance",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(accounts.opening_balance AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "accounts",
+      "column": "staff_incentive",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(200). Always use CAST(accounts.staff_incentive AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "accounts",
+      "column": "unpaid_amount",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(250). Always use CAST(accounts.unpaid_amount AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "quantity",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.quantity AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "opening_stock",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.opening_stock AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "stock_in",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.stock_in AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "stock_out",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.stock_out AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "cost_price",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.cost_price AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "selling_price",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.selling_price AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "purchase_price",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.purchase_price AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "mrp",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.mrp AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "min_sale_price",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(200). Always use CAST(batches.min_sale_price AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "batches",
+      "column": "batch_price",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(255). Always use CAST(batches.batch_price AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "cart_items",
+      "column": "price",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(200). Always use CAST(cart_items.price AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "credit_periods",
+      "column": "credit_percentage",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(10). Always use CAST(credit_periods.credit_percentage AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "offers",
+      "column": "purchase_limit",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "medium",
+      "guidance": "Stored as varchar(50). Always use CAST(offers.purchase_limit AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "products",
+      "column": "price",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(100). Always use CAST(products.price AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "products",
+      "column": "gst_rate",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(10). Always use CAST(products.gst_rate AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "products",
+      "column": "net_price",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(100). Always use CAST(products.net_price AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "products",
+      "column": "cess_amount",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "medium",
+      "guidance": "Stored as varchar(100). Always use CAST(products.cess_amount AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "products",
+      "column": "min_stock_alert",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(100). Always use CAST(products.min_stock_alert AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "products",
+      "column": "max_stock_alert",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(100). Always use CAST(products.max_stock_alert AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "products",
+      "column": "mrp",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(222). Always use CAST(products.mrp AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "voucher",
+      "column": "staff_incentive",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "high",
+      "guidance": "Stored as varchar(200). Always use CAST(voucher.staff_incentive AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "voucherdetails",
+      "column": "get_quantity",
+      "issue": "NUMERIC_STORED_AS_TEXT",
+      "severity": "medium",
+      "guidance": "Stored as varchar(50). Always use CAST(voucherdetails.get_quantity AS DECIMAL(15,2)) in SUM/AVG/comparisons/ORDER BY."
+    },
+    {
+      "table": "voucher",
+      "column": "status",
+      "issue": "ENUM_FILTER_MISMATCH",
+      "severity": "low",
+      "guidance": "status is ENUM('Pending','Partial','Paid'); production P&L still applies the NOT IN ('Cancelled','canceled') filter. Keep it verbatim for reconciliation."
+    },
+    {
+      "table": "voucher",
+      "column": "TransactionType",
+      "issue": "CASE_VARIANTS",
+      "severity": "medium",
+      "guidance": "Backend writes 'stock transfer' and reads 'Stock Transfer'; collation utf8mb4_general_ci makes = comparisons case-insensitive. Never use BINARY comparisons."
+    },
+    {
+      "table": "expensive",
+      "column": null,
+      "issue": "NO_PRIMARY_KEY",
+      "severity": "low",
+      "guidance": "Table has no PK; use COUNT(*) rather than COUNT(DISTINCT id) for expense counts."
+    },
+    {
+      "table": "batches",
+      "column": "exp_date",
+      "issue": "DATE_STORED_AS_TEXT",
+      "severity": "medium",
+      "guidance": "Use STR_TO_DATE(b.exp_date, '%Y-%m-%d') for expiry comparisons."
+    },
+    {
+      "table": null,
+      "column": null,
+      "issue": "RESERVED_WORD_COLUMNS",
+      "severity": "medium",
+      "guidance": "Back-quote reserved column names: accounts.`group`, expensive.`date`, voucher.`Date`."
+    }
+  ],
+  "business_rules": [
+    "Sales revenue = voucher.TransactionType = 'Sales' (PAKKA). 'stock transfer' vouchers are KACHA sales and are EXCLUDED from P&L revenue unless the user explicitly asks for kacha/stock-transfer sales.",
+    "Stock-IN types: Purchase, CreditNote, stock inward. Stock-OUT types: Sales, DebitNote, stock transfer (VochurRoutes.js L1298).",
+    "Sales returns = CreditNote vouchers; purchase returns = DebitNote vouchers.",
+    "Retailers are accounts.role = 'retailer' (dual suppliers have is_dual_account = 1).",
+    "Retailer purchase value = SUM(orders.net_payable) WHERE order_status != 'Cancelled' AND invoice_status = 1 (retailerScore.js).",
+    "Indian financial year runs 1 April - 31 March; 'this FY' means DATE(v.Date) BETWEEN 'YYYY-04-01' AND 'YYYY+1-03-31'.",
+    "All monetary values are INR."
+  ],
+  "calculated_metrics": {
+    "total_sales_revenue": {
+      "description": "Gross sales revenue: sum of Sales voucher TotalAmount excluding cancelled.",
+      "formula_type": "aggregate",
+      "sql_expression": "COALESCE(SUM(v.TotalAmount), 0)",
+      "required_tables": [
+        "voucher"
+      ],
+      "required_joins": [],
+      "filters": [
+        "v.TransactionType = 'Sales'",
+        "(v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '')"
+      ],
+      "date_filter": "DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'",
+      "canonical_sql": "SELECT COALESCE(SUM(v.TotalAmount), 0) AS total_sales_revenue, COUNT(v.VoucherID) AS sales_invoice_count FROM voucher v WHERE v.TransactionType = 'Sales' AND (v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '') AND DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'",
+      "source_reference": "ledger-backend/routes/profitLossRoutes.js#L37-L53"
+    },
+    "cost_of_goods_sold": {
+      "description": "COGS: quantity sold x products.purchase_price, joined by product NAME as in production.",
+      "formula_type": "aggregate",
+      "sql_expression": "COALESCE(SUM(vd.quantity * COALESCE(p.purchase_price, 0)), 0)",
+      "required_tables": [
+        "voucherdetails",
+        "voucher",
+        "products"
+      ],
+      "required_joins": [
+        "voucher.VoucherID = voucherdetails.voucher_id",
+        "products.goods_name = voucherdetails.product (LEFT JOIN)"
+      ],
+      "filters": [
+        "v.TransactionType = 'Sales'",
+        "(v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '')",
+        "vd.transaction_type = 'Sales'"
+      ],
+      "date_filter": "DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'",
+      "canonical_sql": "SELECT COALESCE(SUM(vd.quantity * COALESCE(p.purchase_price, 0)), 0) AS cost_of_goods_sold, COALESCE(SUM(vd.quantity), 0) AS total_units_sold FROM voucherdetails vd JOIN voucher v ON v.VoucherID = vd.voucher_id LEFT JOIN products p ON p.goods_name = vd.product WHERE v.TransactionType = 'Sales' AND (v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '') AND vd.transaction_type = 'Sales' AND DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'",
+      "source_reference": "ledger-backend/routes/profitLossRoutes.js#L57-L76"
+    },
+    "total_expenses": {
+      "description": "Operating expenses from the expensive table excluding cancelled.",
+      "formula_type": "aggregate",
+      "sql_expression": "COALESCE(SUM(e.amount), 0)",
+      "required_tables": [
+        "expensive"
+      ],
+      "required_joins": [],
+      "filters": [
+        "(e.status NOT IN ('Cancelled', 'canceled') OR e.status IS NULL OR e.status = '')"
+      ],
+      "date_filter": "DATE(e.`date`) BETWEEN '{from_date}' AND '{to_date}'",
+      "canonical_sql": "SELECT COALESCE(SUM(e.amount), 0) AS total_expenses, COUNT(*) AS expense_count FROM expensive e WHERE (e.status NOT IN ('Cancelled', 'canceled') OR e.status IS NULL OR e.status = '') AND DATE(e.`date`) BETWEEN '{from_date}' AND '{to_date}'",
+      "source_reference": "ledger-backend/routes/profitLossRoutes.js#L98-L113"
+    },
+    "gross_profit": {
+      "description": "Gross profit = total_sales_revenue - cost_of_goods_sold.",
+      "formula_type": "derived",
+      "sql_expression": "total_sales_revenue - cost_of_goods_sold",
+      "depends_on": [
+        "total_sales_revenue",
+        "cost_of_goods_sold"
+      ],
+      "required_tables": [
+        "voucher",
+        "voucherdetails",
+        "products"
+      ],
+      "required_joins": [],
+      "filters": [],
+      "canonical_sql": "WITH sales AS (SELECT COALESCE(SUM(v.TotalAmount), 0) AS total_sales_revenue, COUNT(v.VoucherID) AS sales_invoice_count FROM voucher v WHERE v.TransactionType = 'Sales' AND (v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '') AND DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'), cogs AS (SELECT COALESCE(SUM(vd.quantity * COALESCE(p.purchase_price, 0)), 0) AS cost_of_goods_sold, COALESCE(SUM(vd.quantity), 0) AS total_units_sold FROM voucherdetails vd JOIN voucher v ON v.VoucherID = vd.voucher_id LEFT JOIN products p ON p.goods_name = vd.product WHERE v.TransactionType = 'Sales' AND (v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '') AND vd.transaction_type = 'Sales' AND DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}') SELECT s.total_sales_revenue, c.cost_of_goods_sold, s.total_sales_revenue - c.cost_of_goods_sold AS gross_profit FROM sales s CROSS JOIN cogs c",
+      "source_reference": "ledger-backend/routes/profitLossRoutes.js#L177-L178"
+    },
+    "net_profit": {
+      "description": "Net profit = gross_profit - total_expenses (positive = PROFIT, negative = LOSS).",
+      "formula_type": "derived",
+      "sql_expression": "total_sales_revenue - cost_of_goods_sold - total_expenses",
+      "depends_on": [
+        "gross_profit",
+        "total_expenses"
+      ],
+      "required_tables": [
+        "voucher",
+        "voucherdetails",
+        "products",
+        "expensive"
+      ],
+      "required_joins": [],
+      "filters": [],
+      "canonical_sql": "WITH sales AS (SELECT COALESCE(SUM(v.TotalAmount), 0) AS total_sales_revenue, COUNT(v.VoucherID) AS sales_invoice_count FROM voucher v WHERE v.TransactionType = 'Sales' AND (v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '') AND DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'), cogs AS (SELECT COALESCE(SUM(vd.quantity * COALESCE(p.purchase_price, 0)), 0) AS cost_of_goods_sold, COALESCE(SUM(vd.quantity), 0) AS total_units_sold FROM voucherdetails vd JOIN voucher v ON v.VoucherID = vd.voucher_id LEFT JOIN products p ON p.goods_name = vd.product WHERE v.TransactionType = 'Sales' AND (v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '') AND vd.transaction_type = 'Sales' AND DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'), expenses AS (SELECT COALESCE(SUM(e.amount), 0) AS total_expenses, COUNT(*) AS expense_count FROM expensive e WHERE (e.status NOT IN ('Cancelled', 'canceled') OR e.status IS NULL OR e.status = '') AND DATE(e.`date`) BETWEEN '{from_date}' AND '{to_date}') SELECT s.total_sales_revenue, c.cost_of_goods_sold, s.total_sales_revenue - c.cost_of_goods_sold AS gross_profit, x.total_expenses, s.total_sales_revenue - c.cost_of_goods_sold - x.total_expenses AS net_profit FROM sales s CROSS JOIN cogs c CROSS JOIN expenses x",
+      "source_reference": "ledger-backend/routes/profitLossRoutes.js#L180-L203"
+    },
+    "party_unpaid_balance": {
+      "description": "Outstanding receivable per party from accounts.unpaid_amount (VARCHAR -> DECIMAL).",
+      "formula_type": "aggregate",
+      "sql_expression": "COALESCE(CAST(a.unpaid_amount AS DECIMAL(15,2)), 0)",
+      "required_tables": [
+        "accounts"
+      ],
+      "required_joins": [],
+      "filters": [
+        "CAST(a.unpaid_amount AS DECIMAL(15,2)) > 0"
+      ],
+      "canonical_sql": "SELECT a.id, a.name, a.business_name, a.role, COALESCE(CAST(a.unpaid_amount AS DECIMAL(15,2)), 0) AS party_unpaid_balance, a.credit_limit FROM accounts a WHERE CAST(a.unpaid_amount AS DECIMAL(15,2)) > 0 ORDER BY party_unpaid_balance DESC",
+      "alternative": "Invoice-level: SUM(v.balance_amount) FROM voucher v WHERE v.TransactionType = 'Sales' GROUP BY v.PartyID (retailerScore.js L929-L941).",
+      "source_reference": "ledger-backend/routes/VochurRoutes.js#L1396-L1440"
+    },
+    "total_purchases": {
+      "description": "Purchase voucher totals (reference only; NOT used as COGS).",
+      "formula_type": "aggregate",
+      "sql_expression": "COALESCE(SUM(v.TotalAmount), 0)",
+      "required_tables": [
+        "voucher"
+      ],
+      "required_joins": [],
+      "filters": [
+        "v.TransactionType = 'Purchase'",
+        "(v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '')"
+      ],
+      "date_filter": "DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'",
+      "canonical_sql": "SELECT COALESCE(SUM(v.TotalAmount), 0) AS total_purchases, COUNT(v.VoucherID) AS purchase_invoice_count FROM voucher v WHERE v.TransactionType = 'Purchase' AND (v.status NOT IN ('Cancelled', 'canceled') OR v.status IS NULL OR v.status = '') AND DATE(v.Date) BETWEEN '{from_date}' AND '{to_date}'",
+      "source_reference": "ledger-backend/routes/profitLossRoutes.js#L79-L95"
+    },
+    "batch_stock_on_hand": {
+      "description": "Live on-hand stock and cost valuation per batch (VARCHAR stock/cost columns cast).",
+      "formula_type": "aggregate",
+      "sql_expression": "CAST(b.quantity AS DECIMAL(15,2))",
+      "required_tables": [
+        "batches",
+        "products"
+      ],
+      "required_joins": [
+        "batches.product_id = products.id"
+      ],
+      "filters": [],
+      "canonical_sql": "SELECT p.goods_name, b.batch_number, b.exp_date, CAST(b.quantity AS DECIMAL(15,2)) AS stock_on_hand, CAST(b.quantity AS DECIMAL(15,2)) * CAST(b.purchase_price AS DECIMAL(15,2)) AS stock_value FROM batches b JOIN products p ON p.id = b.product_id ORDER BY p.goods_name, b.batch_number",
+      "source_reference": "ledger-backend/routes/VochurRoutes.js#L1297-L1345"
+    }
+  }
+}
