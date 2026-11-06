@@ -258,7 +258,7 @@ describe('Adversarial Host ERP Integration Static & Contract Verification', () =
 
     expect(content).toContain('FaBrain');
     expect(content).toContain('path: "/ai-reports"');
-    expect(content).toContain('name: "AI Reports"');
+    expect(content).toContain('name: "AI-Reporting"');
   });
 
   it('verifies Reports.js contains AI Reports navigation tab and renders ErpAiReporter', () => {
@@ -269,7 +269,7 @@ describe('Adversarial Host ERP Integration Static & Contract Verification', () =
     expect(content).toContain('import ErpAiReporter from "./ErpAiReporter";');
     expect(content).toContain('case "ai-reports":');
     expect(content).toContain('<ErpAiReporter isEmbedded={true} />');
-    expect(content).toContain('✨ AI Reports');
+    expect(content).toContain('AI-Reporting');
   });
 
   it('verifies compiled UMD bundle exists and is >= 900KB', () => {

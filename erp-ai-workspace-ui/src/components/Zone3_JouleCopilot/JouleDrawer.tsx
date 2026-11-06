@@ -29,11 +29,11 @@ export const JouleDrawer: React.FC<JouleDrawerProps> = ({
       <button
         onClick={onToggle}
         className="fixed right-0 top-1/2 -translate-y-1/2 z-40 bg-fiori-blue text-white p-2.5 rounded-l-lg shadow-xl hover:bg-fiori-blue-hover transition-all flex items-center space-x-1.5"
-        title="Open Joule Copilot Drawer"
+        title="Open Reporting Copilot Drawer"
       >
         <Bot className="w-4 h-4" />
         <span className="text-xs font-semibold [writing-mode:vertical-rl] rotate-180 py-1">
-          Joule Copilot
+          Reporting Copilot
         </span>
       </button>
     );
@@ -42,7 +42,7 @@ export const JouleDrawer: React.FC<JouleDrawerProps> = ({
   return (
     <aside
       className="w-[380px] shrink-0 bg-white border-l border-fiori-border flex flex-col h-[calc(100vh-64px)] sticky top-16 shadow-lg transition-all z-30"
-      aria-label="SAP Joule Copilot Side Drawer"
+      aria-label="Reporting Copilot Side Drawer"
     >
       {/* Drawer Header */}
       <div className="p-3.5 border-b border-fiori-border flex items-center justify-between bg-gradient-to-r from-blue-50/50 to-white">
@@ -52,10 +52,10 @@ export const JouleDrawer: React.FC<JouleDrawerProps> = ({
           </div>
           <div>
             <h2 className="text-xs font-bold text-fiori-dark flex items-center">
-              Joule Enterprise Copilot
+              Reporting Copilot
             </h2>
             <span className="text-[10px] text-slate-500 font-medium">
-              Autonomous Financial Intelligence
+              AI-powered financial intelligence
             </span>
           </div>
         </div>

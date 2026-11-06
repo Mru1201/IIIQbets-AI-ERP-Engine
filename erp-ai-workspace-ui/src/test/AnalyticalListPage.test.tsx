@@ -24,7 +24,7 @@ describe('AnalyticalListPage (SAP Fiori 3-Zone ALP Integration)', () => {
     });
   });
 
-  it('renders 3-Zone layout with Zone 1 KPIs, Zone 2 Table, and Zone 3 Joule Copilot drawer', async () => {
+  it('renders the reporting workspace with the Reporting Copilot drawer', async () => {
     render(
       <AnalyticalListPage
         apiUrl="http://localhost:8000"
@@ -34,7 +34,7 @@ describe('AnalyticalListPage (SAP Fiori 3-Zone ALP Integration)', () => {
     );
 
     // Header brand and tenant
-    expect(screen.getByText('Autonomous AI ERP Reporting Workspace')).toBeInTheDocument();
+    expect(screen.getByText('AI-Reporting Workspace')).toBeInTheDocument();
     expect(screen.getByText('shree_shashwatraj_agro')).toBeInTheDocument();
 
     // Zone 1: Executive Narrative and Date presets
@@ -50,8 +50,8 @@ describe('AnalyticalListPage (SAP Fiori 3-Zone ALP Integration)', () => {
     expect(screen.getByText('Financial Metric')).toBeInTheDocument();
     expect(screen.getByText('Gross Sales Revenue')).toBeInTheDocument();
 
-    // Zone 3: Joule Drawer
-    expect(screen.getByText('Joule Enterprise Copilot')).toBeInTheDocument();
+    // Reporting Copilot drawer
+    expect(screen.getByText('Reporting Copilot')).toBeInTheDocument();
     expect(screen.getByText('Reasoning & Schema Plan')).toBeInTheDocument();
     expect(screen.getByText('Executable SQL')).toBeInTheDocument();
     expect(screen.getByText('Self-Correction Timeline')).toBeInTheDocument();
@@ -82,7 +82,7 @@ describe('AnalyticalListPage (SAP Fiori 3-Zone ALP Integration)', () => {
     });
   });
 
-  it('toggles Joule Copilot drawer collapse', async () => {
+  it('toggles Reporting Copilot drawer collapse', async () => {
     render(
       <AnalyticalListPage
         apiUrl="http://localhost:8000"
@@ -94,11 +94,11 @@ describe('AnalyticalListPage (SAP Fiori 3-Zone ALP Integration)', () => {
     fireEvent.click(toggleBtn);
 
     // Drawer is collapsed, floating button appears
-    expect(screen.getByTitle('Open Joule Copilot Drawer')).toBeInTheDocument();
+    expect(screen.getByTitle('Open Reporting Copilot Drawer')).toBeInTheDocument();
 
     // Re-open drawer
-    fireEvent.click(screen.getByTitle('Open Joule Copilot Drawer'));
-    expect(screen.getByText('Joule Enterprise Copilot')).toBeInTheDocument();
+    fireEvent.click(screen.getByTitle('Open Reporting Copilot Drawer'));
+    expect(screen.getByText('Reporting Copilot')).toBeInTheDocument();
   });
 
   it('opens and closes Awesomebar Modal via global Cmd+K and Ctrl+K keyboard shortcuts', async () => {

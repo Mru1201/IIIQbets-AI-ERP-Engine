@@ -90,21 +90,28 @@ async def get_current_user(
 
     Enforces Bearer JWT verification in production. In development mode
     (DEV_MODE=True), permits tokenless requests with fallback to headers
-    or default credentials.
+    or default credentials, and bypasses mismatched host ERP tokens.
     """
     dev_mode = is_dev_mode()
 
     if authorization is not None:
         parts = authorization.strip().split()
         if len(parts) != 2 or parts[0].lower() != "bearer":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authorization header format. Expected 'Bearer <token>'.",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        token = parts[1]
-        payload = verify_token(token)
-        return payload
+            if not dev_mode:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid authorization header format. Expected 'Bearer <token>'.",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+        else:
+            token = parts[1]
+            try:
+                payload = verify_token(token)
+                return payload
+            except HTTPException:
+                if not dev_mode:
+                    raise
+                logger.info("DEV_MODE active: bypassing mismatched host ERP token.")
 
     # Missing Authorization header
     if not dev_mode:
@@ -115,8 +122,8 @@ async def get_current_user(
         )
 
     # In DEV_MODE: allow missing token and honor header overrides
-    tenant_id = x_tenant_id or "default"
-    user_id = x_user_id or "dev_user"
+    tenant_id = x_tenant_id or "shree_shashwatraj_agro"
+    user_id = x_user_id or "admin_1"
     role = x_role or "admin"
     return {
         "sub": user_id,

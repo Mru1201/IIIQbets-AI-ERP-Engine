@@ -207,7 +207,7 @@ export const AwesomebarModal: React.FC<AwesomebarModalProps> = ({
 
         {/* Modal Footer */}
         <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
-          <span>SAP Joule NLP Engine &bull; Fail-Closed AST Guardrails</span>
+          <span>Reporting Copilot NLP Engine &bull; Fail-Closed AST Guardrails</span>
           <span>Press Enter ↵ to run</span>
         </div>
       </div>

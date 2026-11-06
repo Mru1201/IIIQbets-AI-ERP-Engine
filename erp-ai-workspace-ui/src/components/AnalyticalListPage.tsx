@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Brain,
   Search,
   LayoutGrid,
   BarChart2,
@@ -168,16 +167,10 @@ export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
       {/* Top Application Header */}
       <header className="h-14 bg-white border-b border-fiori-border px-4 flex items-center justify-between sticky top-0 z-40 shadow-xs">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2">
-            <span className="p-1.5 rounded-lg bg-fiori-blue text-white shadow-2xs">
-              <Brain className="w-5 h-5" />
-            </span>
+          <div className="flex items-center">
             <div>
-              <h1 className="text-sm font-bold text-fiori-dark leading-tight flex items-center">
-                Autonomous AI ERP Reporting Workspace
-                <span className="ml-2 text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-50 text-fiori-blue border border-blue-200">
-                  SAP Fiori ALP
-                </span>
+              <h1 className="text-sm font-bold text-fiori-dark leading-tight">
+                AI-Reporting Workspace
               </h1>
               <span className="text-[11px] text-slate-500 font-medium">
                 Tenant: <span className="font-mono text-slate-700">{tenantId}</span>
@@ -232,7 +225,7 @@ export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
             </button>
           </div>
 
-          {/* Joule Drawer Toggle */}
+          {/* Reporting Copilot Drawer Toggle */}
           <button
             onClick={() => setIsJouleOpen(!isJouleOpen)}
             className={`inline-flex items-center text-xs font-semibold px-2.5 py-1.5 rounded transition-colors ${
@@ -240,10 +233,10 @@ export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
                 ? 'bg-fiori-blue text-white shadow-2xs'
                 : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50'
             }`}
-            title="Toggle Joule Copilot Drawer"
+            title="Toggle Reporting Copilot Drawer"
           >
             <Bot className="w-3.5 h-3.5 mr-1.5" />
-            Joule Copilot
+            Reporting Copilot
           </button>
         </div>
       </header>
