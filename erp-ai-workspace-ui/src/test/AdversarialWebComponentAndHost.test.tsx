@@ -60,7 +60,7 @@ describe('Adversarial Web Component <erp-ai-reporter> Lifecycle & Contracts', ()
     const CustomElementClass: any = customElements.get('erp-ai-reporter');
     const observed = CustomElementClass.observedAttributes || [];
 
-    expect(observed).toEqual(['api-url', 'tenant-id', 'token', 'default-query', 'dev-mode', 'theme']);
+    expect(observed).toEqual(['api-url', 'capture-api-url', 'tenant-id', 'token', 'default-query', 'dev-mode', 'theme']);
     expect(observed).toContain('dev-mode');
     expect(observed).toContain('theme');
   });

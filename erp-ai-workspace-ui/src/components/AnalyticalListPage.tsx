@@ -19,9 +19,11 @@ import { HighDensityTable } from './Zone2_CenterCanvas/HighDensityTable';
 import { JouleDrawer } from './Zone3_JouleCopilot/JouleDrawer';
 import { FormulaInspector } from './Zone3_JouleCopilot/FormulaInspector';
 import { AwesomebarModal } from './Awesomebar/AwesomebarModal';
+import { InvoiceCapturePage } from './InvoiceCapture/InvoiceCapturePage';
 
 export interface AnalyticalListPageProps {
   apiUrl?: string;
+  captureApiUrl?: string;
   tenantId?: string;
   token?: string;
   defaultQuery?: string;
@@ -36,6 +38,7 @@ export interface AnalyticalListPageProps {
 
 export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
   apiUrl = 'http://localhost:8000',
+  captureApiUrl = 'http://localhost:8010',
   tenantId = 'shree_shashwatraj_agro',
   token,
   defaultQuery = 'What is our net profit and gross profit for 2026?',
@@ -61,6 +64,7 @@ export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
   const [activeFilterValue, setActiveFilterValue] = useState<any>(null);
   const [activeFilters, setActiveFilters] = useState<FilterItem[]>([]);
   const [inspectingMetricKey, setInspectingMetricKey] = useState<string | null>(null);
+  const [activeVertical, setActiveVertical] = useState<'reporting' | 'capture'>('reporting');
 
   // Global Cmd+K / Ctrl+K keyboard shortcut to toggle Awesomebar
   useEffect(() => {
@@ -165,25 +169,41 @@ export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
   return (
     <div className="min-h-screen bg-[#F5F6F7] text-fiori-dark flex flex-col font-sans" data-theme={theme}>
       {/* Top Application Header */}
-      <header className="h-14 bg-white border-b border-fiori-border px-4 flex items-center justify-between sticky top-0 z-40 shadow-xs">
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center">
-            <div>
+      <header className="min-h-14 bg-white border-b border-fiori-border px-4 py-2 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-40 shadow-xs">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
+            <div className="min-w-0">
               <h1 className="text-sm font-bold text-fiori-dark leading-tight">
                 AI-Reporting Workspace
               </h1>
-              <span className="text-[11px] text-slate-500 font-medium">
+              <span className="block max-w-[18rem] truncate text-[11px] text-slate-500 font-medium">
                 Tenant: <span className="font-mono text-slate-700">{tenantId}</span>
               </span>
+            </div>
+            <div className="inline-flex rounded-md border border-slate-200 bg-slate-100 p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setActiveVertical('reporting')}
+                className={`rounded px-2.5 py-1.5 ${activeVertical === 'reporting' ? 'bg-white font-semibold text-fiori-blue shadow-2xs' : 'text-slate-600'}`}
+              >
+                AI Reporting
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveVertical('capture')}
+                className={`rounded px-2.5 py-1.5 ${activeVertical === 'capture' ? 'bg-white font-semibold text-fiori-blue shadow-2xs' : 'text-slate-600'}`}
+              >
+                Invoice Capture
+              </button>
             </div>
           </div>
         </div>
 
         {/* Global Awesomebar Cmd+K Search Trigger */}
-        <div className="flex items-center space-x-3">
+        <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-2">
           <button
             onClick={() => setIsAwesomebarOpen(true)}
-            className="flex items-center text-xs text-slate-400 bg-slate-100 hover:bg-slate-200/80 border border-slate-300/80 px-3 py-1.5 rounded-lg w-72 justify-between transition-colors shadow-2xs group"
+            className="flex min-w-0 max-w-full items-center justify-between rounded-lg border border-slate-300/80 bg-slate-100 px-3 py-1.5 text-xs text-slate-400 shadow-2xs transition-colors hover:bg-slate-200/80 group w-[min(28rem,42vw)]"
           >
             <span className="flex items-center text-slate-600 truncate mr-2 font-medium">
               <Search className="w-3.5 h-3.5 mr-2 text-fiori-blue" />
@@ -194,6 +214,8 @@ export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
             </kbd>
           </button>
 
+          {activeVertical === 'reporting' && (
+            <>
           {/* View Mode Switcher */}
           <div className="inline-flex items-center bg-slate-100 p-0.5 rounded-md border border-slate-200 text-xs">
             <button
@@ -236,15 +258,20 @@ export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
             title="Toggle Reporting Copilot Drawer"
           >
             <Bot className="w-3.5 h-3.5 mr-1.5" />
-            Reporting Copilot
+            Copilot
           </button>
+            </>
+          )}
         </div>
       </header>
 
-      {/* Main Workspace 3-Zone Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      {activeVertical === 'capture' ? (
+        <InvoiceCapturePage tenantId={tenantId} token={token} captureApiUrl={captureApiUrl} />
+      ) : (
+      /* Main Workspace 3-Zone Layout */
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         {/* Left Canvas: Zone 1 & Zone 2 */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6 transition-all">
+        <main className="min-w-0 flex-1 overflow-y-auto p-4 transition-all lg:p-6">
           {isLoading && (
             <div className="flex items-center justify-center p-3 mb-4 rounded-lg bg-blue-50/80 border border-blue-200 text-xs font-medium text-fiori-blue animate-pulse">
               <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -313,6 +340,7 @@ export const AnalyticalListPage: React.FC<AnalyticalListPageProps> = ({
           isLoading={isLoading}
         />
       </div>
+      )}
 
       {/* Global NetSuite fx Formula Inspector Popover Modal */}
       <FormulaInspector

@@ -60,7 +60,7 @@ describe('Milestone 4 Iteration 2 Adversarial Stress & Verification Harness', ()
     const CustomElementClass: any = customElements.get('erp-ai-reporter');
     const observed = CustomElementClass.observedAttributes;
 
-    const expectedAttributes = ['api-url', 'tenant-id', 'token', 'default-query', 'dev-mode', 'theme'];
+    const expectedAttributes = ['api-url', 'capture-api-url', 'tenant-id', 'token', 'default-query', 'dev-mode', 'theme'];
     expect(observed).toEqual(expectedAttributes);
 
     const el = document.createElement('erp-ai-reporter') as HTMLElement;
@@ -69,6 +69,7 @@ describe('Milestone 4 Iteration 2 Adversarial Stress & Verification Harness', ()
     // Rapidly mutate all observed attributes
     expect(() => {
       el.setAttribute('api-url', 'http://custom-host:9000');
+      el.setAttribute('capture-api-url', 'http://capture-host:9010');
       el.setAttribute('tenant-id', 'tenant_adversarial_test');
       el.setAttribute('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.adversarial');
       el.setAttribute('default-query', 'Adversarial financial query');

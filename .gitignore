@@ -23,6 +23,7 @@ outputs/
 *.bin
 *.safetensors
 *.pt
+erp-ai-invoice-capture/capture-scans/
 
 # 5. Agent metadata & OS files
 .agents/

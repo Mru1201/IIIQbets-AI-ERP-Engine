@@ -32,6 +32,7 @@ describe('WebComponent <erp-ai-reporter>', () => {
     const CustomElementClass: any = customElements.get('erp-ai-reporter');
     expect(CustomElementClass.observedAttributes).toEqual([
       'api-url',
+      'capture-api-url',
       'tenant-id',
       'token',
       'default-query',

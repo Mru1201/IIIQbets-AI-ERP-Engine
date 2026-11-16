@@ -1,6 +1,8 @@
 import { ReportQueryRequest, ReportQueryResponse, MetricDefinition } from '../types/api';
+import { CaptureDocument, CaptureExtraction, CaptureDocumentType } from '../types/capture';
 
 const DEFAULT_API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:8000';
+const DEFAULT_CAPTURE_API_URL = import.meta.env?.VITE_CAPTURE_API_URL || 'http://localhost:8010';
 
 export const CANONICAL_METRICS: Record<string, MetricDefinition> = {
   total_sales_revenue: {
@@ -106,6 +108,81 @@ export async function queryReport(
     console.warn('Backend query failed, falling back to local simulation:', err.message);
     return generateMockReport(request);
   }
+}
+
+function captureHeaders(token?: string, tenantId = 'shree_shashwatraj_agro'): Record<string, string> {
+  const headers: Record<string, string> = { 'X-Tenant-ID': tenantId };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
+
+async function captureRequest<T>(
+  endpoint: string,
+  init: RequestInit,
+  captureApiUrl = DEFAULT_CAPTURE_API_URL
+): Promise<T> {
+  const response = await fetch(`${captureApiUrl.replace(/\/+$/, '')}${endpoint}`, init);
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const detail = body?.detail;
+    const message = typeof detail === 'string' ? detail : detail ? JSON.stringify(detail) : null;
+    throw new Error(message || `Invoice capture request failed with status ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function uploadCaptureDocument(
+  file: File,
+  tenantId: string,
+  token?: string,
+  captureApiUrl?: string
+): Promise<CaptureDocument> {
+  const body = new FormData();
+  body.append('file', file);
+  const result = await captureRequest<{ document: CaptureDocument }>(
+    '/api/v1/capture/documents',
+    { method: 'POST', headers: captureHeaders(token, tenantId), body },
+    captureApiUrl
+  );
+  return result.document;
+}
+
+export async function extractCaptureDocument(
+  documentId: string,
+  tenantId: string,
+  token?: string,
+  captureApiUrl?: string
+): Promise<CaptureDocument> {
+  const result = await captureRequest<{ document: CaptureDocument }>(
+    `/api/v1/capture/documents/${documentId}/extract`,
+    { method: 'POST', headers: captureHeaders(token, tenantId) },
+    captureApiUrl
+  );
+  return result.document;
+}
+
+export async function confirmCaptureDocument(
+  documentId: string,
+  extraction: CaptureExtraction,
+  documentType: CaptureDocumentType,
+  duplicateResolution: CaptureDocument['duplicate_resolution'],
+  tenantId: string,
+  token?: string,
+  captureApiUrl?: string
+): Promise<{ document: CaptureDocument; backend_response?: Record<string, unknown> }> {
+  return captureRequest(
+    `/api/v1/capture/documents/${documentId}/confirm`,
+    {
+      method: 'POST',
+      headers: { ...captureHeaders(token, tenantId), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        extraction: { ...extraction, document_type: documentType },
+        duplicate_resolution: duplicateResolution,
+        idempotency_key: `${documentId}-${Date.now()}`,
+      }),
+    },
+    captureApiUrl
+  );
 }
 
 export function generateMockReport(request: ReportQueryRequest): ReportQueryResponse {

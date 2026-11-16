@@ -41,7 +41,7 @@ export const JouleDrawer: React.FC<JouleDrawerProps> = ({
 
   return (
     <aside
-      className="w-[380px] shrink-0 bg-white border-l border-fiori-border flex flex-col h-[calc(100vh-64px)] sticky top-16 shadow-lg transition-all z-30"
+      className="order-last flex max-h-[min(34rem,55vh)] w-full shrink-0 flex-col border-t border-fiori-border bg-white shadow-lg transition-all z-30 lg:order-none lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] lg:max-h-none lg:w-[clamp(300px,28vw,380px)] lg:border-l lg:border-t-0"
       aria-label="Reporting Copilot Side Drawer"
     >
       {/* Drawer Header */}

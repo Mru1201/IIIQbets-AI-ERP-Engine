@@ -12,7 +12,7 @@ export class ErpAiReporterElement extends HTMLElement {
   private root: ReactDOM.Root | null = null;
 
   static get observedAttributes() {
-    return ['api-url', 'tenant-id', 'token', 'default-query', 'dev-mode', 'theme'];
+    return ['api-url', 'capture-api-url', 'tenant-id', 'token', 'default-query', 'dev-mode', 'theme'];
   }
 
   connectedCallback() {
@@ -50,6 +50,7 @@ export class ErpAiReporterElement extends HTMLElement {
     if (!this.mountPoint) return;
 
     const apiUrl = this.getAttribute('api-url') || 'http://localhost:8000';
+    const captureApiUrl = this.getAttribute('capture-api-url') || 'http://localhost:8010';
     const tenantId = this.getAttribute('tenant-id') || 'shree_shashwatraj_agro';
     const token = this.getAttribute('token') || undefined;
     const defaultQuery =
@@ -65,6 +66,7 @@ export class ErpAiReporterElement extends HTMLElement {
       <React.StrictMode>
         <AnalyticalListPage
           apiUrl={apiUrl}
+          captureApiUrl={captureApiUrl}
           tenantId={tenantId}
           token={token}
           defaultQuery={defaultQuery}

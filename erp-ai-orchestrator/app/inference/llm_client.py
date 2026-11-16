@@ -141,6 +141,29 @@ def extract_json_payload(raw_text: str) -> dict[str, Any]:
     }
 
 
+def normalize_invoice_extraction(data: dict[str, Any]) -> dict[str, Any]:
+    """Map common multimodal party nesting to the capture schema."""
+    normalized = dict(data)
+    document_type = normalized.get("document_type")
+    if isinstance(document_type, dict):
+        normalized["document_type"] = document_type.get("value")
+
+    for party, name_key, gstin_key in (
+        ("supplier", "supplier_name", "supplier_gstin"),
+        ("customer", "customer_name", "customer_gstin"),
+    ):
+        details = normalized.get(party)
+        if not isinstance(details, dict):
+            continue
+        if name_key not in normalized and isinstance(details.get("name"), dict):
+            normalized[name_key] = details["name"]
+        if gstin_key not in normalized and isinstance(details.get("gst_in"), dict):
+            normalized[gstin_key] = details["gst_in"]
+    normalized.pop("supplier", None)
+    normalized.pop("customer", None)
+    return normalized
+
+
 class LLMClient:
     """Client for generating constrained ReportPlanSchema responses from an LLM."""
 
@@ -157,6 +180,69 @@ class LLMClient:
         self._http_client = http_client
         self._async_http_client = async_http_client
         self.last_token_usage: dict[str, int] = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+
+    async def generate_invoice_extraction_async(
+        self,
+        *,
+        tenant_id: str,
+        file_name: str,
+        content_type: str,
+        source_base64: str,
+        document_type: str | None = None,
+    ) -> dict[str, Any]:
+        """Extract a normalized GST-first invoice object without touching ERP data."""
+        system_prompt = (
+            "You extract invoice data for an ERP review workflow. Return JSON only. "
+            "Never invent values: use null and add a warning when a value is unreadable. "
+            "Preserve numeric values as numbers. Supported document types are purchase, sales, "
+            "expense, credit-note, and debit-note. Include confidence from 0 to 1 for every "
+            "field using {value, confidence, corrected:false, warning:null}."
+        )
+        user_text = (
+            f"Tenant: {tenant_id}\nFile: {file_name}\nContent type: {content_type}\n"
+            f"Requested document type: {document_type or 'classify'}\n"
+            "Extract document_type, supplier/customer names and GSTINs, invoice_number, "
+            "invoice_date, taxable_value, cgst_amount, sgst_amount, igst_amount, total_tax, "
+            "total_amount, lines[{product,product_id,hsn_code,quantity,unit_price,discount,"
+            "gst_rate,cgst_rate,sgst_rate,igst_rate,total}], and warnings."
+        )
+        endpoint, payload, headers = self._prepare_request(system_prompt, user_text)
+        messages = payload.get("messages", [])
+        if messages:
+            messages[-1] = {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": user_text},
+                    {"type": "image_url", "image_url": {"url": f"data:{content_type};base64,{source_base64}"}},
+                ],
+            }
+            payload["messages"] = messages
+        payload["max_tokens"] = 4096
+        payload["response_format"] = {"type": "json_object"}
+        if self.settings.llm_provider == "vllm":
+            payload.pop("guided_json", None)
+        timeout_s = self.settings.llm_timeout_s or 60.0
+        for attempt in range(3):
+            try:
+                async with httpx.AsyncClient(timeout=timeout_s) as client:
+                    response = await client.post(endpoint, json=payload, headers=headers)
+                    response.raise_for_status()
+                content = self._extract_usage_and_content(response.json())
+                data = extract_json_payload(content)
+                break
+            except Exception as exc:
+                normalized = self._normalize_http_exception(exc)
+                retryable = isinstance(normalized, (LLMTimeoutError, LLMConnectionError, LLMRateLimitError)) or (
+                    isinstance(normalized, LLMResponseError)
+                    and normalized.status_code in TRANSIENT_HTTP_STATUS_CODES
+                )
+                if retryable and attempt < 2:
+                    await asyncio.sleep(0.5 * (attempt + 1))
+                    continue
+                raise normalized from exc
+        if not isinstance(data, dict):
+            raise LLMResponseError("Invoice extraction response was not a JSON object", provider=self.settings.llm_provider)
+        return normalize_invoice_extraction(data)
 
     def _build_payload_openai(
         self,

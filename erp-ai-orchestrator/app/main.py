@@ -17,6 +17,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.reports import router as reports_router
+from app.api.v1.capture import router as capture_router
 from app.config import get_settings
 from app.connectors.executor import DatabaseExecutor
 from app.inference.llm_client import LLMClient
@@ -131,5 +132,6 @@ app.get("/health", tags=["system"])(health_check)
 api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.get("/health", tags=["system"])(health_check)
 api_v1_router.include_router(reports_router)
+api_v1_router.include_router(capture_router)
 
 app.include_router(api_v1_router)

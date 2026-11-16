@@ -33,7 +33,7 @@ SENSITIVE_COLUMN_PATTERNS: tuple[str, ...] = (
 # Raw binary payloads are never useful for reporting and are excluded.
 EXCLUDED_COLUMN_TYPES: tuple[str, ...] = ("blob", "longblob", "mediumblob", "tinyblob", "binary", "varbinary")
 
-LLMProvider = Literal["openai", "vllm", "ollama", "gemini", "openrouter"]
+LLMProvider = Literal["openai", "vllm", "ollama", "gemini", "openrouter", "huggingface"]
 
 PROVIDER_DEFAULTS: dict[str, dict[str, Any]] = {
     "vllm": {
@@ -56,7 +56,7 @@ PROVIDER_DEFAULTS: dict[str, dict[str, Any]] = {
     },
     "gemini": {
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
-        "model": "gemini-2.0-flash",
+        "model": "gemini-3.8-flash",
         "timeout_s": 30.0,
         "api_key": None,
     },
@@ -64,6 +64,12 @@ PROVIDER_DEFAULTS: dict[str, dict[str, Any]] = {
         "base_url": "https://openrouter.ai/api/v1",
         "model": "qwen/qwen-2.5-coder-32b-instruct",
         "timeout_s": 45.0,
+        "api_key": None,
+    },
+    "huggingface": {
+        "base_url": "https://router.huggingface.co/v1",
+        "model": "Qwen/Qwen2.5-VL-72B-Instruct:cheapest",
+        "timeout_s": 90.0,
         "api_key": None,
     },
 }
@@ -141,6 +147,9 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = Field(default=None, validation_alias=AliasChoices("ERP_GEMINI_API_KEY", "GEMINI_API_KEY"))
     openrouter_api_key: str | None = Field(default=None, validation_alias=AliasChoices("ERP_OPENROUTER_API_KEY", "OPENROUTER_API_KEY"))
     openai_api_key: str | None = Field(default=None, validation_alias=AliasChoices("ERP_OPENAI_API_KEY", "OPENAI_API_KEY"))
+    hf_token: str | None = Field(default=None, validation_alias=AliasChoices("HF_TOKEN", "ERP_HF_TOKEN"))
+    hf_base_url: str | None = Field(default=None, validation_alias=AliasChoices("HF_BASE_URL", "ERP_HF_BASE_URL"))
+    hf_vision_model: str | None = Field(default=None, validation_alias=AliasChoices("HF_VISION_MODEL", "ERP_HF_VISION_MODEL"))
 
     # Sub-Schema Router (Milestone 5)
     enable_schema_router: bool = Field(default=False, validation_alias=AliasChoices("ERP_ENABLE_SCHEMA_ROUTER", "ENABLE_SCHEMA_ROUTER"))
@@ -153,6 +162,12 @@ class Settings(BaseSettings):
     def _populate_provider_defaults(self) -> "Settings":
         provider = self.llm_provider
         defaults = PROVIDER_DEFAULTS.get(provider, PROVIDER_DEFAULTS["vllm"])
+
+        if provider == "huggingface":
+            if self.hf_base_url:
+                self.llm_base_url = self.hf_base_url
+            if self.hf_vision_model:
+                self.llm_model = self.hf_vision_model
 
         # If base_url was not explicitly supplied, set provider default
         if "llm_base_url" not in self.model_fields_set or not self.llm_base_url:
@@ -172,6 +187,8 @@ class Settings(BaseSettings):
                 self.llm_api_key = self.gemini_api_key
             elif provider == "openrouter" and self.openrouter_api_key:
                 self.llm_api_key = self.openrouter_api_key
+            elif provider == "huggingface" and self.hf_token:
+                self.llm_api_key = self.hf_token
             elif provider == "openai" and self.openai_api_key:
                 self.llm_api_key = self.openai_api_key
             else:

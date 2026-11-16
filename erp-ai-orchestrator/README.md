@@ -91,6 +91,27 @@ Formulas in `app/metastore/semantic_overlay.py` are codified verbatim from `ledg
 
 ## 4. Setup and Verification
 
+### Invoice Capture Inference
+
+The orchestrator also exposes the read-only invoice extraction route used by
+`erp-ai-invoice-capture`. It performs multimodal inference only; posting
+transactions remains the responsibility of the capture adapter and the Shree
+ledger API.
+
+For the demo, Hugging Face can be selected without changing source code:
+
+```bash
+export ERP_LLM_PROVIDER=huggingface
+export HF_TOKEN='<your Hugging Face token>'
+export HF_BASE_URL=https://router.huggingface.co/v1
+export HF_VISION_MODEL='Qwen/Qwen3-VL-30B-A3B-Instruct:cheapest'
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Keep tokens in the shell environment or a local, ignored `.env` file. Do not
+commit credentials. If the provider is unavailable, the capture API reports
+the upstream status and a user-visible extraction failure message.
+
 ### Virtual Environment & Requirements
 ```bash
 cd erp-ai-orchestrator
