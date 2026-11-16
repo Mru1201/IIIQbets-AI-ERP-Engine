@@ -28,3 +28,7 @@ erp-ai-invoice-capture/capture-scans/
 # 5. Agent metadata & OS files
 .agents/
 .DS_Store
+
+# 6. Local planning and demo artifacts
+AI_CHAT_IMPLEMENTATION_PLAN.md
+ERP-AI-Demo-Runbook.pdf
